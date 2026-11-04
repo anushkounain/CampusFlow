@@ -10,6 +10,10 @@ import {
   LogOut,
   ShieldCheck,
   Building2,
+  FileText,
+  MessageSquare,
+  BarChart2,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Badge } from './Badge';
@@ -21,9 +25,15 @@ export const Sidebar: React.FC = () => {
     { name: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
     { name: 'Academics', to: '/academics', icon: GraduationCap },
     { name: 'AI Study Assistant', to: '/ai-study', icon: Sparkles },
+    { name: 'Document RAG', to: '/documents-rag', icon: FileText },
+    { name: 'Discussions & Groups', to: '/discussions', icon: MessageSquare },
     { name: 'Career & Placement', to: '/career', icon: Briefcase },
     { name: 'Campus Community', to: '/community', icon: Users },
     { name: 'Marketplace', to: '/marketplace', icon: ShoppingBag },
+    { name: 'Analytics & Transcripts', to: '/analytics', icon: BarChart2 },
+    ...(user?.role === 'admin'
+      ? [{ name: 'Audit Logs', to: '/audit-logs', icon: ShieldCheck }]
+      : []),
   ];
 
   const getRoleBadgeVariant = (role?: string) => {
@@ -92,7 +102,7 @@ export const Sidebar: React.FC = () => {
       {/* Main Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         <div className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-          Main Modules
+          Campus Modules
         </div>
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -101,7 +111,7 @@ export const Sidebar: React.FC = () => {
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all ${
+                `flex items-center px-3 py-2 text-xs font-medium rounded-lg transition-all ${
                   isActive
                     ? 'bg-blue-600 text-white shadow-xs font-semibold'
                     : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
@@ -119,7 +129,7 @@ export const Sidebar: React.FC = () => {
       <div className="p-4 border-t border-slate-800/80 space-y-3">
         <div className="flex items-center text-xs text-slate-400 space-x-2 px-2">
           <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span>RBAC Backend Active</span>
+          <span>RBAC Enforcement Active</span>
         </div>
         <button
           onClick={logout}

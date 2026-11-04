@@ -9,9 +9,13 @@ import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { AcademicsPage } from './pages/AcademicsPage';
 import { AiStudyPage } from './pages/AiStudyPage';
+import { DocumentsRagPage } from './pages/DocumentsRagPage';
+import { DiscussionsPage } from './pages/DiscussionsPage';
 import { CareerPage } from './pages/CareerPage';
 import { CommunityPage } from './pages/CommunityPage';
 import { MarketplacePage } from './pages/MarketplacePage';
+import { AnalyticsPage } from './pages/AnalyticsPage';
+import { AuditLogPage } from './pages/AuditLogPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,9 +43,13 @@ export function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/academics" element={<AcademicsPage />} />
                 <Route path="/ai-study" element={<AiStudyPage />} />
+                <Route path="/documents-rag" element={<DocumentsRagPage />} />
+                <Route path="/discussions" element={<DiscussionsPage />} />
                 <Route path="/career" element={<CareerPage />} />
                 <Route path="/community" element={<CommunityPage />} />
                 <Route path="/marketplace" element={<MarketplacePage />} />
+                <Route path="/analytics" element={<AnalyticsPage />} />
+                <Route path="/audit-logs" element={<AuditLogPage />} />
               </Route>
             </Route>
 

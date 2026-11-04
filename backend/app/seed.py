@@ -3,13 +3,18 @@ from sqlalchemy.orm import Session
 from app.database import SessionLocal, init_db
 from app.core.security import hash_password
 from app.models.user import User, UserRole, StudentProfile, FacultyProfile
-from app.models.academic import Course, TimetableSlot, Attendance, Assignment
-from app.models.career import JobPosting
+from app.models.academic import Course, TimetableSlot, Attendance, Assignment, GradeRecord
+from app.models.career import JobPosting, StudentSkill, InterviewPrepQuestion
 from app.models.community import Announcement, CampusEvent
+from app.models.document import Document, DocumentChunk, FlashcardDeck, FlashcardCard
+from app.models.discussion import DiscussionThread, DiscussionComment, StudyGroup, StudyGroupMember
+from app.models.marketplace import MarketplaceListing
+from app.models.audit import AuditLog
+from app.services.rag_service import RAGProcessor
 
 
 def seed_database(db: Session = None):
-    """Seed sample data for immediate development and demonstration."""
+    """Seed comprehensive sample data across all university lifecycle modules."""
     close_db = False
     if db is None:
         init_db()
@@ -31,8 +36,6 @@ def seed_database(db: Session = None):
             is_active=True,
             is_verified=True,
         )
-        db.add(admin)
-
         faculty = User(
             email="faculty@campusflow.edu",
             hashed_password=hash_password("Faculty@123"),
@@ -42,8 +45,6 @@ def seed_database(db: Session = None):
             is_active=True,
             is_verified=True,
         )
-        db.add(faculty)
-
         placement = User(
             email="placement@campusflow.edu",
             hashed_password=hash_password("Placement@123"),
@@ -53,8 +54,6 @@ def seed_database(db: Session = None):
             is_active=True,
             is_verified=True,
         )
-        db.add(placement)
-
         student = User(
             email="student@campusflow.edu",
             hashed_password=hash_password("Student@123"),
@@ -64,7 +63,7 @@ def seed_database(db: Session = None):
             is_active=True,
             is_verified=True,
         )
-        db.add(student)
+        db.add_all([admin, faculty, placement, student])
         db.flush()
 
         # Profiles
@@ -199,7 +198,29 @@ def seed_database(db: Session = None):
         )
         db.add_all([j1, j2, j3])
 
-        # 6. Community Announcements & Events
+        # 6. Student Skills & Interview Prep
+        s1 = StudentSkill(student_id=student.id, skill_name="Distributed Systems", proficiency="Advanced", years_experience=2, is_verified=True)
+        s2 = StudentSkill(student_id=student.id, skill_name="Python / FastAPI", proficiency="Expert", years_experience=3, is_verified=True)
+        s3 = StudentSkill(student_id=student.id, skill_name="React & TypeScript", proficiency="Advanced", years_experience=2, is_verified=True)
+        db.add_all([s1, s2, s3])
+
+        q1 = InterviewPrepQuestion(
+            company_name="Google",
+            role_category="Distributed Systems",
+            question_text="How do you detect split-brain situations in quorum-based consensus systems like Paxos or Raft?",
+            difficulty="Hard",
+            recommended_approach="Explain strict majority quorum intersection (N/2 + 1) invariant guarantees.",
+        )
+        q2 = InterviewPrepQuestion(
+            company_name="Microsoft",
+            role_category="Full-Stack",
+            question_text="Describe how you prevent optimistic concurrency conflicts in relational distributed databases.",
+            difficulty="Medium",
+            recommended_approach="Use version numbering or timestamp fields with conditional UPDATE statements.",
+        )
+        db.add_all([q1, q2])
+
+        # 7. Community Announcements & Events
         an1 = Announcement(
             title="Mid-Semester Examination Schedule Published",
             content="The Mid-Semester timetable for all undergraduate engineering semesters is officially uploaded to the Academic Portal.",
@@ -232,12 +253,157 @@ def seed_database(db: Session = None):
         )
         db.add_all([ev1, ev2])
 
-        # 7. Attendance records
+        # 8. Attendance Records
         att1 = Attendance(student_id=student.id, course_id=c1.id, date="2026-10-28", status="present")
         att2 = Attendance(student_id=student.id, course_id=c2.id, date="2026-10-29", status="present")
         att3 = Attendance(student_id=student.id, course_id=c3.id, date="2026-10-30", status="present")
         att4 = Attendance(student_id=student.id, course_id=c4.id, date="2026-10-31", status="present")
         db.add_all([att1, att2, att3, att4])
+
+        # 9. Academic Grades (Gradebook & SGPA Calculation)
+        grades = [
+            GradeRecord(student_id=student.id, course_id=c1.id, semester=5, letter_grade="A+", grade_point=10.0, credit_hours=4, remarks="Exceptional"),
+            GradeRecord(student_id=student.id, course_id=c2.id, semester=5, letter_grade="A", grade_point=9.0, credit_hours=4, remarks="Excellent"),
+            GradeRecord(student_id=student.id, course_id=c3.id, semester=5, letter_grade="A", grade_point=9.0, credit_hours=3, remarks="Excellent"),
+            GradeRecord(student_id=student.id, course_id=c4.id, semester=5, letter_grade="B+", grade_point=8.0, credit_hours=3, remarks="Good"),
+            GradeRecord(student_id=student.id, course_id=c1.id, semester=4, letter_grade="A+", grade_point=10.0, credit_hours=4, remarks="Outstanding"),
+            GradeRecord(student_id=student.id, course_id=c2.id, semester=4, letter_grade="A", grade_point=9.0, credit_hours=4, remarks="Very Good"),
+        ]
+        db.add_all(grades)
+
+        # 10. Indexed Course Documents & Semantic Chunks for RAG
+        sample_syllabus_text = (
+            "Distributed Systems course syllabus covers quorum consensus protocols, RPC serialization, "
+            "vector clocks, and Paxos and Raft algorithms. In partitioned networks, the CAP theorem states "
+            "that a distributed system cannot simultaneously guarantee Consistency, Availability, and Partition Tolerance. "
+            "Raft breaks leader election into terms. A leader heartbeats to followers to prevent election timeouts. "
+            "Log replication ensures state machine replication consistency across all live cluster nodes."
+        )
+        doc1 = Document(
+            title="CS301 Distributed Systems Lecture Notes & Syllabus",
+            filename="CS301_Distributed_Systems_Complete.pdf",
+            file_size_bytes=len(sample_syllabus_text.encode('utf-8')),
+            course_id=c1.id,
+            uploader_id=faculty.id,
+            summary="Official lecture notes on consensus protocols, Raft, Paxos, and distributed storage engines.",
+            page_count=14,
+        )
+        db.add(doc1)
+        db.flush()
+
+        chunks = RAGProcessor.chunk_text(sample_syllabus_text, chunk_size=30, chunk_overlap=10)
+        for ch in chunks:
+            chunk_rec = DocumentChunk(
+                document_id=doc1.id,
+                chunk_index=ch["chunk_index"],
+                page_number=1 + ch["chunk_index"],
+                content=ch["content"],
+                token_count=ch["token_count"],
+                keywords=ch["keywords"],
+            )
+            db.add(chunk_rec)
+
+        # 11. Flashcard Decks
+        deck1 = FlashcardDeck(
+            user_id=student.id,
+            title="Distributed Systems Exam Prep",
+            topic="CS301 Distributed Systems",
+            description="Core flashcards covering Raft, Vector Clocks, and CAP Theorem.",
+        )
+        db.add(deck1)
+        db.flush()
+
+        fc1 = FlashcardCard(deck_id=deck1.id, front="What is the CAP Theorem?", back="Trade-off between Consistency, Availability, and Partition Tolerance.", difficulty="medium")
+        fc2 = FlashcardCard(deck_id=deck1.id, front="How does Raft resolve leader election split votes?", back="Randomized election timeouts ensure one candidate initiates election before others.", difficulty="hard")
+        db.add_all([fc1, fc2])
+
+        # 12. Campus Discussions & Study Groups
+        thread1 = DiscussionThread(
+            course_id=c1.id,
+            author_id=student.id,
+            title="Difference between Lamport Timestamps and Vector Clocks?",
+            content="Can someone explain with an example why Lamport timestamps cannot detect concurrent events whereas Vector Clocks can?",
+            tags="Distributed Systems, Clocks, Concurrency",
+            upvotes=12,
+            views=45,
+            is_resolved=True,
+        )
+        db.add(thread1)
+        db.flush()
+
+        comment1 = DiscussionComment(
+            thread_id=thread1.id,
+            author_id=faculty.id,
+            content="Lamport timestamps give a total order consistent with causality, but L(a) < L(b) does not imply a caused b. Vector clocks track per-process causal history, allowing detection of concurrent events if neither vector dominates the other.",
+            is_solution=True,
+            upvotes=8,
+        )
+        db.add(comment1)
+
+        group1 = StudyGroup(
+            name="Cloud Systems & Distributed Lab Circle",
+            course_id=c1.id,
+            description="Collaborative group implementing Raft consensus simulation in Python.",
+            meeting_schedule="Thursdays 6:00 PM",
+            meeting_link="https://meet.campusflow.edu/cs301-lab",
+            max_members=6,
+            created_by_id=student.id,
+        )
+        db.add(group1)
+        db.flush()
+        db.add(StudyGroupMember(group_id=group1.id, user_id=student.id))
+
+        # 13. Marketplace Listings
+        m1 = MarketplaceListing(
+            title="Operating System Concepts (Silberschatz - 10th Edition)",
+            description="Official textbook with clean pages, negligible pencil markings. Covers OS scheduling and virtual memory.",
+            category="Textbook",
+            price="₹650",
+            condition="Like New",
+            seller_id=student.id,
+            status="available",
+            contact_phone_or_email="student@campusflow.edu",
+        )
+        m2 = MarketplaceListing(
+            title="Hero Sprint Pro 21-Speed Geared Mountain Bicycle",
+            description="Serviced last month with new dual disc brakes and LED headlights. Perfect for campus commuting.",
+            category="Bicycle",
+            price="₹3,200",
+            condition="Good",
+            seller_id=student.id,
+            status="available",
+            contact_phone_or_email="student@campusflow.edu",
+        )
+        m3 = MarketplaceListing(
+            title="FOUND: Silver Casio Scientific Calculator (FX-991EX)",
+            description="Discovered in Central Library 2nd Floor Silent Study Section. Owner can claim by verifying serial number.",
+            category="Lost & Found",
+            price="Free / Claim",
+            condition="Good",
+            seller_id=faculty.id,
+            status="available",
+            contact_phone_or_email="faculty@campusflow.edu",
+        )
+        db.add_all([m1, m2, m3])
+
+        # 14. Initial Security & Audit Logs
+        log1 = AuditLog(
+            user_id=admin.id,
+            action="SYSTEM_INIT",
+            entity_type="System",
+            entity_id="1",
+            details='{"event": "CampusFlow Initialized with Full RBAC"}',
+            ip_address="127.0.0.1",
+        )
+        log2 = AuditLog(
+            user_id=faculty.id,
+            action="DOCUMENT_INDEX",
+            entity_type="Document",
+            entity_id=str(doc1.id),
+            details='{"title": "CS301 Lecture Notes", "chunks": 5}',
+            ip_address="127.0.0.1",
+        )
+        db.add_all([log1, log2])
 
         db.commit()
     finally:
@@ -247,4 +413,4 @@ def seed_database(db: Session = None):
 
 if __name__ == "__main__":
     seed_database()
-    print("Database seeded successfully with initial users, courses, jobs, and events.")
+    print("Database seeded successfully with all extended enterprise modules.")

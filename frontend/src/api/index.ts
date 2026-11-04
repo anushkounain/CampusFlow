@@ -11,6 +11,14 @@ import {
   Announcement,
   CampusEvent,
   AcademicSummary,
+  DocumentItem,
+  RAGQueryResult,
+  DiscussionThread,
+  DiscussionComment,
+  StudyGroup,
+  MarketplaceListing,
+  GradebookSummary,
+  AuditLogEntry,
 } from '../types';
 
 export const authApi = {
@@ -83,6 +91,82 @@ export const communityApi = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+};
+
+export const documentsApi = {
+  getDocuments: (courseId?: number) =>
+    apiRequest<DocumentItem[]>(`/documents/${courseId ? `?course_id=${courseId}` : ''}`),
+  indexDocument: (data: { title: string; filename: string; content_text: string; course_id?: number }) =>
+    apiRequest<DocumentItem>('/documents/index', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  ragQuery: (data: { query: string; course_id?: number; top_k?: number }) =>
+    apiRequest<RAGQueryResult>('/documents/rag-query', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+};
+
+export const discussionsApi = {
+  getThreads: (tag?: string) =>
+    apiRequest<DiscussionThread[]>(`/discussions/${tag ? `?tag=${tag}` : ''}`),
+  createThread: (data: { title: string; content: string; tags?: string; course_id?: number }) =>
+    apiRequest<DiscussionThread>('/discussions/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  getThread: (id: number) =>
+    apiRequest<DiscussionThread>(`/discussions/${id}`),
+  addComment: (threadId: number, content: string) =>
+    apiRequest<DiscussionComment>(`/discussions/${threadId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    }),
+  upvoteThread: (threadId: number) =>
+    apiRequest<{ upvotes: number }>(`/discussions/${threadId}/upvote`, {
+      method: 'POST',
+    }),
+  getStudyGroups: () =>
+    apiRequest<StudyGroup[]>('/discussions/study-groups/all'),
+  createStudyGroup: (data: Partial<StudyGroup>) =>
+    apiRequest<StudyGroup>('/discussions/study-groups/create', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+};
+
+export const marketplaceApi = {
+  getListings: (category?: string) =>
+    apiRequest<MarketplaceListing[]>(`/marketplace/${category && category !== 'All' ? `?category=${category}` : ''}`),
+  createListing: (data: Partial<MarketplaceListing>) =>
+    apiRequest<MarketplaceListing>('/marketplace/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateStatus: (id: number, status: string) =>
+    apiRequest<MarketplaceListing>(`/marketplace/${id}/status?new_status=${status}`, {
+      method: 'PATCH',
+    }),
+  sendInquiry: (listingId: number, message: string) =>
+    apiRequest<any>(`/marketplace/${listingId}/inquiries`, {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    }),
+};
+
+export const analyticsApi = {
+  getGradebook: () =>
+    apiRequest<GradebookSummary>('/analytics/gradebook'),
+  getAttendanceRisks: () =>
+    apiRequest<any[]>('/analytics/attendance-risks'),
+  getPlacementStats: () =>
+    apiRequest<any>('/analytics/placement-stats'),
+};
+
+export const auditApi = {
+  getLogs: (action?: string) =>
+    apiRequest<AuditLogEntry[]>(`/audit/logs${action ? `?action=${action}` : ''}`),
 };
 
 export const aiApi = {

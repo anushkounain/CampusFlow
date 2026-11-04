@@ -129,3 +129,113 @@ export interface AcademicSummary {
   enrolled_courses_count: number;
   pending_assignments_count: number;
 }
+
+// Extended Module Entities
+
+export interface DocumentItem {
+  id: number;
+  title: string;
+  filename: string;
+  file_size_bytes: number;
+  mime_type: string;
+  course_id?: number;
+  summary?: string;
+  page_count: number;
+  created_at: string;
+}
+
+export interface RAGSource {
+  title: string;
+  page: number;
+  relevance_score: number;
+  excerpt: string;
+}
+
+export interface RAGQueryResult {
+  query: string;
+  answer: string;
+  sources: RAGSource[];
+}
+
+export interface DiscussionComment {
+  id: number;
+  thread_id: number;
+  author_id: number;
+  content: string;
+  is_solution: boolean;
+  upvotes: number;
+  created_at: string;
+}
+
+export interface DiscussionThread {
+  id: number;
+  course_id?: number;
+  author_id: number;
+  title: string;
+  content: string;
+  tags: string;
+  upvotes: number;
+  views: number;
+  is_resolved: boolean;
+  created_at: string;
+  comments: DiscussionComment[];
+}
+
+export interface StudyGroup {
+  id: number;
+  name: string;
+  course_id?: number;
+  description?: string;
+  meeting_schedule: string;
+  meeting_link?: string;
+  max_members: number;
+  created_by_id: number;
+  created_at: string;
+}
+
+export interface MarketplaceListing {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  price: string;
+  condition: string;
+  seller_id: number;
+  status: string;
+  contact_phone_or_email?: string;
+  created_at: string;
+}
+
+export interface GradeItem {
+  course_id: number;
+  course_code: string;
+  course_name: string;
+  letter_grade: string;
+  grade_point: number;
+  credit_hours: number;
+  remarks?: string;
+}
+
+export interface SemesterGradebook {
+  semester: number;
+  sgpa: number;
+  total_credits: number;
+  courses: GradeItem[];
+}
+
+export interface GradebookSummary {
+  cumulative_cgpa: number;
+  total_credits_earned: number;
+  semesters: SemesterGradebook[];
+}
+
+export interface AuditLogEntry {
+  id: number;
+  user_id?: number;
+  action: string;
+  entity_type: string;
+  entity_id?: string;
+  details?: string;
+  ip_address?: string;
+  created_at: string;
+}
