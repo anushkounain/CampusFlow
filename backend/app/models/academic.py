@@ -20,6 +20,7 @@ class Course(Base):
     timetable_slots = relationship("TimetableSlot", back_populates="course", cascade="all, delete-orphan")
     assignments = relationship("Assignment", back_populates="course", cascade="all, delete-orphan")
     attendance_records = relationship("Attendance", back_populates="course", cascade="all, delete-orphan")
+    grades = relationship("GradeRecord", back_populates="course", cascade="all, delete-orphan")
 
 
 class Enrollment(Base):
@@ -91,3 +92,20 @@ class Submission(Base):
 
     assignment = relationship("Assignment", back_populates="submissions")
     student = relationship("User", back_populates="submissions")
+
+
+class GradeRecord(Base):
+    __tablename__ = "grade_records"
+
+    id = Column(Integer, primary_key=True, index=True)
+    student_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    course_id = Column(Integer, ForeignKey("courses.id", ondelete="CASCADE"), nullable=False)
+    semester = Column(Integer, nullable=False)
+    letter_grade = Column(String(5), nullable=False)   # A+, A, B+, B, C, F
+    grade_point = Column(Float, nullable=False)        # 10.0, 9.0, 8.0, 7.0, 6.0, 0.0
+    credit_hours = Column(Integer, default=3, nullable=False)
+    remarks = Column(String(100), default="Passed with Distinction", nullable=True)
+    awarded_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    student = relationship("User")
+    course = relationship("Course", back_populates="grades")
