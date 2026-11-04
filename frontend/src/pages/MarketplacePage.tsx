@@ -1,79 +1,87 @@
-import React, { useState } from 'react';
-import { ShoppingBag, Search, PlusCircle, Tag, DollarSign, MessageCircle, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, PlusCircle, MessageCircle, CheckCircle } from 'lucide-react';
 import { Card } from '../components/common/Card';
 import { Badge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
-
-interface MarketItem {
-  id: number;
-  title: string;
-  category: 'Textbook' | 'Electronics' | 'Bicycle' | 'Dorm' | 'Lost & Found';
-  price: string;
-  seller: string;
-  condition: string;
-  postedDate: string;
-}
+import { marketplaceApi } from '../api';
+import { MarketplaceListing } from '../types';
 
 export const MarketplacePage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [searchTerm, setSearchTerm] = useState('');
+  const [items, setItems] = useState<MarketplaceListing[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [items, setItems] = useState<MarketItem[]>([
-    {
-      id: 1,
-      title: 'Operating System Concepts (Silberschatz - 10th Ed)',
-      category: 'Textbook',
-      price: '₹650',
-      seller: 'Rahul Verma (CS 4th Sem)',
-      condition: 'Like New (Minimal highlighting)',
-      postedDate: 'Yesterday',
-    },
-    {
-      id: 2,
-      title: 'Hero Sprint Pro 21-Speed Geared Mountain Bicycle',
-      category: 'Bicycle',
-      price: '₹3,200',
-      seller: 'Aditya Rao (ECE 6th Sem)',
-      condition: 'Good condition, serviced last month',
-      postedDate: '2 days ago',
-    },
-    {
-      id: 3,
-      title: 'Raspberry Pi 4 Model B (4GB RAM) with Starter Kit',
-      category: 'Electronics',
-      price: '₹4,500',
-      seller: 'Sneha Patel (CS 8th Sem)',
-      condition: 'Tested & Verified, original casing included',
-      postedDate: '3 days ago',
-    },
-    {
-      id: 4,
-      title: 'FOUND: Silver Casio Scientific Calculator (FX-991EX)',
-      category: 'Lost & Found',
-      price: 'Free / Claim',
-      seller: 'Security Desk (Library Block 2)',
-      condition: 'Found at 2nd Floor Reading Room',
-      postedDate: 'Today',
-    },
-    {
-      id: 5,
-      title: 'Ergonomic Desk Study Lamp with Dual USB Ports',
-      category: 'Dorm',
-      price: '₹400',
-      seller: 'Priya Sharma (Mech 6th Sem)',
-      condition: 'Excellent working order',
-      postedDate: '4 days ago',
-    },
-  ]);
+  // New Listing Form
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newDesc, setNewDesc] = useState('');
+  const [newCat, setNewCat] = useState('Textbook');
+  const [newPrice, setNewPrice] = useState('₹500');
+  const [newCondition, setNewCondition] = useState('Good');
+
+  // Contact Modal
+  const [contactItem, setContactItem] = useState<MarketplaceListing | null>(null);
+  const [inquiryText, setInquiryText] = useState('');
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const categories = ['All', 'Textbook', 'Electronics', 'Bicycle', 'Dorm', 'Lost & Found'];
 
+  const loadListings = async () => {
+    try {
+      const data = await marketplaceApi.getListings(activeCategory);
+      setItems(data);
+    } catch (err) {
+      console.error('Failed to load marketplace listings', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadListings();
+  }, [activeCategory]);
+
+  const handleCreateListing = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const created = await marketplaceApi.createListing({
+        title: newTitle,
+        description: newDesc,
+        category: newCat,
+        price: newPrice,
+        condition: newCondition,
+      });
+      setItems((prev) => [created, ...prev]);
+      setShowAddModal(false);
+      setNewTitle('');
+      setNewDesc('');
+      setSuccessMsg('Your listing was published successfully!');
+      setTimeout(() => setSuccessMsg(null), 4000);
+    } catch (err: any) {
+      alert(err.message || 'Failed to create listing');
+    }
+  };
+
+  const handleSendInquiry = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contactItem || !inquiryText.trim()) return;
+    try {
+      await marketplaceApi.sendInquiry(contactItem.id, inquiryText);
+      setSuccessMsg(`Inquiry sent to seller for "${contactItem.title}"!`);
+      setContactItem(null);
+      setInquiryText('');
+      setTimeout(() => setSuccessMsg(null), 4000);
+    } catch (err: any) {
+      alert(err.message || 'Failed to send inquiry');
+    }
+  };
+
   const filteredItems = items.filter((item) => {
-    const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
-    const matchesSearch =
+    return (
       item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.seller.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
+      item.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
   });
 
   return (
@@ -81,16 +89,83 @@ export const MarketplacePage: React.FC = () => {
       {/* Title */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Campus Marketplace & Exchange</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            Campus Marketplace & Student Exchange
+          </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Student peer-to-peer textbook trades, dorm essentials, and verified lost & found
+            Student peer-to-peer textbook trades, dorm equipment, bicycles, and verified lost & found registry
           </p>
         </div>
-        <Button size="sm">
+        <Button size="sm" onClick={() => setShowAddModal(!showAddModal)}>
           <PlusCircle className="w-4 h-4 mr-2" />
-          Create New Listing
+          {showAddModal ? 'Cancel' : 'Create New Listing'}
         </Button>
       </div>
+
+      {successMsg && (
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center">
+          <CheckCircle className="w-5 h-5 mr-3 text-emerald-600" />
+          <span>{successMsg}</span>
+        </div>
+      )}
+
+      {/* New Listing Modal */}
+      {showAddModal && (
+        <Card className="border-blue-200 bg-blue-50/20">
+          <h3 className="text-sm font-bold text-slate-900 mb-3">Publish Item Listing</h3>
+          <form onSubmit={handleCreateListing} className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <input
+                type="text"
+                placeholder="Item Title (e.g. Operating Systems Textbook)"
+                required
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                className="sm:col-span-2 px-3 py-2 text-xs border rounded-lg bg-white"
+              />
+              <select
+                value={newCat}
+                onChange={(e) => setNewCat(e.target.value)}
+                className="px-3 py-2 text-xs border rounded-lg bg-white"
+              >
+                <option value="Textbook">Textbook</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Bicycle">Bicycle</option>
+                <option value="Dorm">Dorm</option>
+                <option value="Lost & Found">Lost & Found</option>
+              </select>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input
+                type="text"
+                placeholder="Price (e.g. ₹600 or Free)"
+                required
+                value={newPrice}
+                onChange={(e) => setNewPrice(e.target.value)}
+                className="px-3 py-2 text-xs border rounded-lg bg-white"
+              />
+              <input
+                type="text"
+                placeholder="Condition (e.g. Like New / Good / Mint)"
+                value={newCondition}
+                onChange={(e) => setNewCondition(e.target.value)}
+                className="px-3 py-2 text-xs border rounded-lg bg-white"
+              />
+            </div>
+            <textarea
+              rows={3}
+              placeholder="Detailed description, pickup block or verification instructions..."
+              required
+              value={newDesc}
+              onChange={(e) => setNewDesc(e.target.value)}
+              className="w-full px-3 py-2 text-xs border rounded-lg bg-white"
+            />
+            <div className="flex justify-end">
+              <Button type="submit" size="sm">Publish to Marketplace</Button>
+            </div>
+          </form>
+        </Card>
+      )}
 
       {/* Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -124,6 +199,36 @@ export const MarketplacePage: React.FC = () => {
         </div>
       </div>
 
+      {/* Contact Seller Modal */}
+      {contactItem && (
+        <Card className="border-emerald-200 bg-emerald-50/20">
+          <h3 className="text-sm font-bold text-slate-900 mb-1">
+            Contact Seller for: {contactItem.title}
+          </h3>
+          <p className="text-xs text-slate-500 mb-3">
+            Send an instant inquiry or meeting request for item pickup.
+          </p>
+          <form onSubmit={handleSendInquiry} className="space-y-3">
+            <textarea
+              rows={2}
+              required
+              value={inquiryText}
+              onChange={(e) => setInquiryText(e.target.value)}
+              placeholder="Hi, is this still available? I can meet at Academic Block A..."
+              className="w-full px-3 py-2 text-xs border rounded-lg bg-white"
+            />
+            <div className="flex items-center space-x-2 justify-end">
+              <Button type="button" size="sm" variant="ghost" onClick={() => setContactItem(null)}>
+                Cancel
+              </Button>
+              <Button type="submit" size="sm">
+                Send Inquiry
+              </Button>
+            </div>
+          </form>
+        </Card>
+      )}
+
       {/* Listings Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredItems.map((item) => (
@@ -142,10 +247,15 @@ export const MarketplacePage: React.FC = () => {
                 >
                   {item.category}
                 </Badge>
-                <span className="text-[11px] font-semibold text-slate-400">{item.postedDate}</span>
+                <span className="text-[11px] font-semibold text-slate-400">
+                  {new Date(item.created_at).toLocaleDateString()}
+                </span>
               </div>
               <h3 className="text-base font-bold text-slate-900 leading-snug">{item.title}</h3>
               <p className="text-xs text-slate-500">{item.condition}</p>
+              <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                {item.description}
+              </p>
             </div>
 
             <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
@@ -153,7 +263,7 @@ export const MarketplacePage: React.FC = () => {
                 <p className="text-xs text-slate-400 font-medium">Price / Claim</p>
                 <p className="text-base font-extrabold text-slate-900">{item.price}</p>
               </div>
-              <Button size="sm" variant="outline">
+              <Button size="sm" variant="outline" onClick={() => setContactItem(item)}>
                 <MessageCircle className="w-3.5 h-3.5 mr-1.5 text-blue-600" />
                 Contact
               </Button>
