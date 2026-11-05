@@ -16,6 +16,9 @@ import { CommunityPage } from './pages/CommunityPage';
 import { MarketplacePage } from './pages/MarketplacePage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import { AuditLogPage } from './pages/AuditLogPage';
+import { PlacementIntelligencePage } from './pages/PlacementIntelligencePage';
+import { AcademicRiskAdvisorPage } from './pages/AcademicRiskAdvisorPage';
+import { ModelTelemetryPage } from './pages/ModelTelemetryPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,9 +49,12 @@ export function App() {
                 <Route path="/documents-rag" element={<DocumentsRagPage />} />
                 <Route path="/discussions" element={<DiscussionsPage />} />
                 <Route path="/career" element={<CareerPage />} />
+                <Route path="/placement-ai" element={<PlacementIntelligencePage />} />
+                <Route path="/academic-risk" element={<AcademicRiskAdvisorPage />} />
                 <Route path="/community" element={<CommunityPage />} />
                 <Route path="/marketplace" element={<MarketplacePage />} />
                 <Route path="/analytics" element={<AnalyticsPage />} />
+                <Route path="/model-telemetry" element={<ModelTelemetryPage />} />
                 <Route path="/audit-logs" element={<AuditLogPage />} />
               </Route>
             </Route>

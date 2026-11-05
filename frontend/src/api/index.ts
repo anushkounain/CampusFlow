@@ -19,6 +19,12 @@ import {
   MarketplaceListing,
   GradebookSummary,
   AuditLogEntry,
+  MLTelemetry,
+  PlacementPredictionResult,
+  PlacementSimulationResult,
+  AcademicRiskAssessmentResult,
+  CohortRiskOverview,
+  SkillMatchReport,
 } from '../types';
 
 export const authApi = {
@@ -167,6 +173,35 @@ export const analyticsApi = {
 export const auditApi = {
   getLogs: (action?: string) =>
     apiRequest<AuditLogEntry[]>(`/audit/logs${action ? `?action=${action}` : ''}`),
+};
+
+export const intelligenceApi = {
+  getStatus: () =>
+    apiRequest<MLTelemetry>('/intelligence/models/status'),
+  retrainModels: () =>
+    apiRequest<any>('/intelligence/models/retrain', { method: 'POST' }),
+  predictPlacement: (data: any) =>
+    apiRequest<PlacementPredictionResult>('/intelligence/placement/predict', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  simulateCareer: (data: any) =>
+    apiRequest<PlacementSimulationResult>('/intelligence/placement/simulate', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  assessAcademicRisk: (data: any) =>
+    apiRequest<AcademicRiskAssessmentResult>('/intelligence/academic-risk/assess', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  getCohortRisk: () =>
+    apiRequest<CohortRiskOverview>('/intelligence/academic-risk/cohort'),
+  matchSkills: (data: { student_skills: string[]; required_skills: string[]; preferred_skills?: string[] }) =>
+    apiRequest<SkillMatchReport>('/intelligence/skills/match', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
 };
 
 export const aiApi = {

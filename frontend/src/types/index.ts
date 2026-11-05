@@ -130,8 +130,6 @@ export interface AcademicSummary {
   pending_assignments_count: number;
 }
 
-// Extended Module Entities
-
 export interface DocumentItem {
   id: number;
   title: string;
@@ -238,4 +236,99 @@ export interface AuditLogEntry {
   details?: string;
   ip_address?: string;
   created_at: string;
+}
+
+// Machine Learning & Intelligence Entities
+
+export interface FeatureImpact {
+  feature: string;
+  importance_weight: number;
+  student_value: number;
+}
+
+export interface PlacementPredictionResult {
+  placement_probability: number;
+  placement_percentage: number;
+  status_bracket: string;
+  projected_salary_lpa: number;
+  top_factors: FeatureImpact[];
+}
+
+export interface PlacementSimulationResult {
+  baseline: PlacementPredictionResult;
+  simulated: PlacementPredictionResult;
+  deltas: {
+    placement_prob_change_pct: number;
+    projected_salary_change_lpa: number;
+  };
+  recommendation: string;
+}
+
+export interface AcademicRiskAssessmentResult {
+  risk_category: 'DEANS_LIST' | 'GOOD_STANDING' | 'MODERATE_RISK' | 'CRITICAL_RISK';
+  confidence: number;
+  class_probabilities: Record<string, number>;
+  actionable_interventions: string[];
+  primary_driver: string;
+}
+
+export interface CohortStudentRisk {
+  student_id: number;
+  name: string;
+  roll_number: string;
+  current_cgpa: number;
+  attendance_rate: number;
+  risk_category: string;
+  interventions: string[];
+}
+
+export interface CohortRiskOverview {
+  summary: Record<string, number>;
+  students: CohortStudentRisk[];
+}
+
+export interface RecommendedCourse {
+  code: string;
+  name: string;
+}
+
+export interface SkillMatchReport {
+  match_percentage: number;
+  status: string;
+  matched_required_skills: string[];
+  missing_required_skills: string[];
+  matched_preferred_skills: string[];
+  missing_preferred_skills: string[];
+  recommended_courses: RecommendedCourse[];
+}
+
+export interface MLModelMetrics {
+  accuracy: number;
+  precision?: number;
+  recall?: number;
+  f1_score?: number;
+  roc_auc?: number;
+  mae_salary_lpa?: number;
+  total_records?: number;
+  confusion_matrix?: number[][];
+  feature_importances?: Record<string, number>;
+  feature_importance?: Record<string, number>;
+}
+
+export interface MLTelemetry {
+  status: string;
+  placement_model: {
+    name: string;
+    dataset: string;
+    metrics: MLModelMetrics;
+  };
+  retention_model: {
+    name: string;
+    dataset: string;
+    metrics: MLModelMetrics;
+  };
+  skill_matcher: {
+    name: string;
+    taxonomy_roles_count: number;
+  };
 }

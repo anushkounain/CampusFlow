@@ -13,7 +13,9 @@ import {
   FileText,
   MessageSquare,
   BarChart2,
-  FileSpreadsheet,
+  TrendingUp,
+  AlertTriangle,
+  Cpu,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Badge } from './Badge';
@@ -28,9 +30,12 @@ export const Sidebar: React.FC = () => {
     { name: 'Document RAG', to: '/documents-rag', icon: FileText },
     { name: 'Discussions & Groups', to: '/discussions', icon: MessageSquare },
     { name: 'Career & Placement', to: '/career', icon: Briefcase },
+    { name: 'Career Intelligence AI', to: '/placement-ai', icon: TrendingUp },
+    { name: 'Academic Risk Radar', to: '/academic-risk', icon: AlertTriangle },
     { name: 'Campus Community', to: '/community', icon: Users },
     { name: 'Marketplace', to: '/marketplace', icon: ShoppingBag },
     { name: 'Analytics & Transcripts', to: '/analytics', icon: BarChart2 },
+    { name: 'MLOps & Telemetry', to: '/model-telemetry', icon: Cpu },
     ...(user?.role === 'admin'
       ? [{ name: 'Audit Logs', to: '/audit-logs', icon: ShieldCheck }]
       : []),
@@ -102,7 +107,7 @@ export const Sidebar: React.FC = () => {
       {/* Main Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         <div className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-          Campus Modules
+          Campus Intelligence
         </div>
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -129,7 +134,7 @@ export const Sidebar: React.FC = () => {
       <div className="p-4 border-t border-slate-800/80 space-y-3">
         <div className="flex items-center text-xs text-slate-400 space-x-2 px-2">
           <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span>RBAC Enforcement Active</span>
+          <span>ML Pipelines Online</span>
         </div>
         <button
           onClick={logout}
