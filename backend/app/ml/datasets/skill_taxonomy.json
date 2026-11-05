@@ -1,0 +1,106 @@
+{
+  "roles": {
+    "Cloud Systems Engineer": {
+      "core_skills": [
+        "Python",
+        "Go",
+        "Docker",
+        "Kubernetes",
+        "Distributed Systems",
+        "Linux",
+        "gRPC"
+      ],
+      "secondary_skills": [
+        "CI/CD",
+        "Terraform",
+        "PostgreSQL",
+        "System Design"
+      ],
+      "recommended_courses": [
+        "CS301",
+        "CS304"
+      ]
+    },
+    "Machine Learning Engineer": {
+      "core_skills": [
+        "Python",
+        "PyTorch",
+        "TensorFlow",
+        "Scikit-Learn",
+        "Data Structures",
+        "Linear Algebra"
+      ],
+      "secondary_skills": [
+        "MLOps",
+        "Transformers",
+        "SQL",
+        "Docker",
+        "CUDA"
+      ],
+      "recommended_courses": [
+        "CS302",
+        "CS303"
+      ]
+    },
+    "Full-Stack Software Engineer": {
+      "core_skills": [
+        "React",
+        "TypeScript",
+        "Python",
+        "FastAPI",
+        "PostgreSQL",
+        "REST APIs"
+      ],
+      "secondary_skills": [
+        "Tailwind CSS",
+        "Redis",
+        "Docker",
+        "Git",
+        "System Architecture"
+      ],
+      "recommended_courses": [
+        "CS301",
+        "CS303",
+        "CS304"
+      ]
+    },
+    "Database & Data Platform Engineer": {
+      "core_skills": [
+        "PostgreSQL",
+        "SQL",
+        "Database Indexing",
+        "ACID Transactions",
+        "Python",
+        "Data Modeling"
+      ],
+      "secondary_skills": [
+        "Kafka",
+        "Spark",
+        "NoSQL",
+        "Query Optimization"
+      ],
+      "recommended_courses": [
+        "CS303",
+        "CS301"
+      ]
+    }
+  },
+  "all_skills": [
+    "Python",
+    "TypeScript",
+    "React",
+    "FastAPI",
+    "SQL",
+    "PostgreSQL",
+    "Docker",
+    "Kubernetes",
+    "Distributed Systems",
+    "PyTorch",
+    "Git",
+    "Data Structures",
+    "Algorithms",
+    "System Design",
+    "CI/CD",
+    "Linux"
+  ]
+}
