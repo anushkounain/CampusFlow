@@ -18,6 +18,9 @@ import { Button } from '../common/Button';
 import { academicsApi, communityApi } from '../../api';
 import { Course, TimetableSlot, Assignment, Announcement, AcademicSummary } from '../../types';
 import { useAuth } from '../../context/AuthContext';
+import { CampusAmbientMesh } from './CampusAmbientMesh';
+import { CampusPulseWidget } from './CampusPulseWidget';
+import { CampusScratchpad } from './CampusScratchpad';
 
 export const StudentDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -55,39 +58,50 @@ export const StudentDashboard: React.FC = () => {
   }, []);
 
   return (
-    <div className="space-y-8">
-      {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-blue-950 rounded-2xl p-8 text-white shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-6 border border-slate-700/50">
-        <div>
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-medium border border-blue-400/20 mb-3">
+    <div className="space-y-8 relative">
+      <CampusAmbientMesh variant="blue" />
+
+      {/* Signature Cosmic Aurora Banner */}
+      <div className="bg-gradient-to-r from-slate-950 via-indigo-950/95 to-blue-900 rounded-2xl p-8 text-white shadow-xl shadow-indigo-950/20 flex flex-col md:flex-row md:items-center md:justify-between gap-6 border border-indigo-500/30 relative overflow-hidden backdrop-blur-md">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10">
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-medium border border-blue-400/30 mb-3">
+            <span className="flex h-2 w-2 rounded-full bg-cyan-400 animate-ping-subtle" />
             <span>Student Life Management Portal</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Welcome back, {user?.full_name}
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            Welcome back, <span className="bg-gradient-to-r from-blue-300 via-indigo-200 to-cyan-300 bg-clip-text text-transparent">{user?.full_name}</span>
           </h1>
           <p className="text-slate-300 text-sm mt-1 max-w-xl">
             {user?.student_profile?.program || 'B.Tech Computer Science & Engineering'} • Semester {user?.student_profile?.semester || 6} • Roll #{user?.student_profile?.roll_number || 'CS2023048'}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 relative z-10">
           <Button
             variant="outline"
             onClick={() => navigate('/ai-study')}
-            className="bg-white/10 hover:bg-white/20 text-white border-white/20"
+            className="bg-white/10 hover:bg-white/20 text-white border-white/20 shadow-md backdrop-blur-sm"
           >
-            <Sparkles className="w-4 h-4 mr-2 text-blue-400" />
-            AI Study Assistant
+            <Sparkles className="w-4 h-4 mr-2 text-cyan-300" />
+            AI Study Copilot
           </Button>
           <Button
             variant="primary"
-            onClick={() => navigate('/career')}
-            className="bg-blue-600 hover:bg-blue-500"
+            onClick={() => navigate('/placement-ai')}
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-600/30"
           >
             <Briefcase className="w-4 h-4 mr-2" />
-            Explore Placements
+            Career Intelligence
           </Button>
         </div>
       </div>
+
+      {/* Live Campus Pulse Widget */}
+      <CampusPulseWidget
+        attendanceRate={summary?.attendance_rate || 88.5}
+        cgpa={summary?.cgpa || 8.85}
+        role="student"
+      />
 
       {/* Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -316,6 +330,9 @@ export const StudentDashboard: React.FC = () => {
               ))}
             </div>
           </Card>
+
+          {/* Interactive Scratchpad & Checklist */}
+          <CampusScratchpad />
         </div>
       </div>
     </div>

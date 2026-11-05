@@ -15,6 +15,7 @@ import { Badge } from '../common/Badge';
 import { Button } from '../common/Button';
 import { statsApi, healthApi } from '../../api';
 import { useAuth } from '../../context/AuthContext';
+import { CampusAmbientMesh } from './CampusAmbientMesh';
 
 export const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -39,24 +40,41 @@ export const AdminDashboard: React.FC = () => {
   }, []);
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="bg-slate-900 rounded-2xl p-8 text-white border border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div>
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-medium border border-blue-400/20 mb-3">
+    <div className="space-y-8 relative">
+      <CampusAmbientMesh variant="purple" />
+
+      {/* Signature Cosmic Violet & Obsidian Gradient Banner */}
+      <div className="bg-gradient-to-r from-slate-950 via-purple-950/80 to-slate-900 rounded-2xl p-8 text-white border border-indigo-500/30 shadow-xl shadow-purple-950/20 flex flex-col md:flex-row md:items-center md:justify-between gap-6 relative overflow-hidden backdrop-blur-md">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10">
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-medium border border-purple-400/30 mb-3">
+            <span className="flex h-2 w-2 rounded-full bg-purple-400 animate-ping-subtle" />
             <span>Executive Administration & System Governance</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Institutional Control Center
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            Institutional <span className="bg-gradient-to-r from-purple-300 via-indigo-200 to-pink-200 bg-clip-text text-transparent">Control Center</span>
           </h1>
           <p className="text-slate-300 text-sm mt-1 max-w-xl">
             Logged in as: {user?.full_name} ({user?.department || 'Dean Office'}) • Full RBAC Clearance
           </p>
         </div>
-        <div className="flex items-center space-x-3">
-          <Badge variant="green" size="md">
-            <CheckCircle className="w-3.5 h-3.5 mr-1.5" /> All Services Nominal
-          </Badge>
+        <div className="flex items-center gap-3 relative z-10">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/audit-logs')}
+            className="bg-white/10 hover:bg-white/20 text-white border-white/20 shadow-md backdrop-blur-sm"
+          >
+            <ShieldAlert className="w-4 h-4 mr-2 text-purple-300" />
+            Audit Logs
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => navigate('/analytics')}
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg shadow-purple-600/30"
+          >
+            <Activity className="w-4 h-4 mr-2" />
+            Institutional Metrics
+          </Button>
         </div>
       </div>
 

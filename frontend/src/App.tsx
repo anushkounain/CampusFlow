@@ -6,6 +6,7 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { LandingPage } from './pages/LandingPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { AcademicsPage } from './pages/AcademicsPage';
 import { AiStudyPage } from './pages/AiStudyPage';
@@ -35,14 +36,14 @@ export function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* Public Auth Routes */}
+            {/* Public Start & Auth Routes */}
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
             {/* Protected Application Routes */}
             <Route element={<ProtectedRoute />}>
               <Route element={<AppLayout />}>
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/academics" element={<AcademicsPage />} />
                 <Route path="/ai-study" element={<AiStudyPage />} />

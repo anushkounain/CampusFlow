@@ -147,6 +147,26 @@ npm run dev
 ```
 
 - **Frontend Application**: `http://localhost:5173`
+- **Interactive Start Page & Role Simulator**: `http://localhost:5173/`
+- **Authenticated Dashboard Command Center**: `http://localhost:5173/dashboard`
+
+---
+
+## 🎨 UI/UX Design & Motion System
+
+- **Interactive Start Page (`/`)**:
+  - Cosmic Twilight gradient theme with animated mesh glow orbs (`animate-pulse-glow`, `animate-float`).
+  - Interactive multi-role sandbox simulator previewing Student, Faculty, Placement, and Admin views with one click.
+  - One-click instant role launcher bypassing manual credential input.
+  - Live interactive AI Study Copilot testbed with syllabus-grounded answer generation.
+- **Dynamic Home Screen Gradient Architecture**:
+  - Multi-stop ambient radial meshes (`CampusAmbientMesh`) with color profiles adapted per role (Sapphire/Indigo for Students, Emerald for Faculty, Amber for Placement, Cosmic Violet for Admin).
+  - **Live Campus Pulse Widget**:
+    - Timetable lecture countdown timer.
+    - SVG animated circular attendance health gauge with regulatory margin alert (<75%).
+    - Quick AI Ask copilot bar directly on the dashboard.
+  - **Interactive Academic Scratchpad**:
+    - Local persistent study task checklist with categorical tag pills.
 
 ---
 

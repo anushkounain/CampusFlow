@@ -16,6 +16,7 @@ import {
   TrendingUp,
   AlertTriangle,
   Cpu,
+  Compass,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Badge } from './Badge';
@@ -131,8 +132,15 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {/* Footer Info & Logout */}
-      <div className="p-4 border-t border-slate-800/80 space-y-3">
-        <div className="flex items-center text-xs text-slate-400 space-x-2 px-2">
+      <div className="p-4 border-t border-slate-800/80 space-y-2">
+        <NavLink
+          to="/"
+          className="w-full flex items-center justify-center px-3 py-1.5 text-xs font-medium text-slate-300 bg-slate-800/40 hover:bg-slate-800 hover:text-white rounded-lg transition-colors border border-slate-700/40"
+        >
+          <Compass className="w-3.5 h-3.5 mr-1.5 text-blue-400" />
+          <span>Start Page Showcase</span>
+        </NavLink>
+        <div className="flex items-center text-xs text-slate-400 space-x-2 px-2 py-1">
           <ShieldCheck className="w-4 h-4 text-emerald-400" />
           <span>ML Pipelines Online</span>
         </div>

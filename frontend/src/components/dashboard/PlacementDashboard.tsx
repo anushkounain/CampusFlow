@@ -17,6 +17,7 @@ import { Button } from '../common/Button';
 import { careerApi } from '../../api';
 import { JobPosting } from '../../types';
 import { useAuth } from '../../context/AuthContext';
+import { CampusAmbientMesh } from './CampusAmbientMesh';
 
 export const PlacementDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -36,28 +37,40 @@ export const PlacementDashboard: React.FC = () => {
   }, []);
 
   return (
-    <div className="space-y-8">
-      {/* Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-2xl p-8 text-white border border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div>
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-medium border border-amber-400/20 mb-3">
+    <div className="space-y-8 relative">
+      <CampusAmbientMesh variant="amber" />
+
+      {/* Signature Amber & Royal Indigo Gradient Banner */}
+      <div className="bg-gradient-to-r from-slate-950 via-amber-950/70 to-indigo-950 rounded-2xl p-8 text-white border border-amber-500/30 shadow-xl shadow-amber-950/20 flex flex-col md:flex-row md:items-center md:justify-between gap-6 relative overflow-hidden backdrop-blur-md">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10">
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-medium border border-amber-400/30 mb-3">
+            <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-ping-subtle" />
             <span>Career & Industry Relations Directorate</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Placement Command Center
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            Placement <span className="bg-gradient-to-r from-amber-300 via-orange-200 to-yellow-200 bg-clip-text text-transparent">Command Center</span>
           </h1>
           <p className="text-slate-300 text-sm mt-1 max-w-xl">
             Coordinator: {user?.full_name} • Office of Career Services • 2026 Graduating Cohort
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 relative z-10">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/placement-ai')}
+            className="bg-white/10 hover:bg-white/20 text-white border-white/20 shadow-md backdrop-blur-sm"
+          >
+            <TrendingUp className="w-4 h-4 mr-2 text-amber-300" />
+            Simulation AI
+          </Button>
           <Button
             variant="primary"
             onClick={() => navigate('/career')}
-            className="bg-blue-600 hover:bg-blue-500"
+            className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white shadow-lg shadow-amber-600/30"
           >
             <PlusCircle className="w-4 h-4 mr-2" />
-            Post New Opportunity
+            Post Opportunity
           </Button>
         </div>
       </div>
